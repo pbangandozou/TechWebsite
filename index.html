@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prustide Bangandozou — IT Tech Portfolio</title>
+<meta name="description" content="Network diagnostics, LAN design, IT support tooling, and home lab projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        #0D1117;
+    --panel:      #131B22;
+    --panel-alt:  #182129;
+    --line:       #263139;
+    --line-soft:  #1D262E;
+    --text:       #E7EDF2;
+    --text-dim:   #8FA0AC;
+    --text-faint: #5C6B76;
+    --amber:      #F2A93B;
+    --amber-dim:  #7A5A22;
+    --teal:       #46C2B9;
+    --teal-dim:   #204A47;
+    --red:        #E1604D;
+
+    --font-head: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+    --maxw: 1080px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:var(--font-head);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+  img{ max-width:100%; display:block; }
+
+  ::selection{ background:var(--amber); color:#181008; }
+
+  :focus-visible{
+    outline:2px solid var(--amber);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  .wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ---------- background circuit texture ---------- */
+  .grid-bg{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    opacity:0.55;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 85%);
+  }
+
+  /* ---------- status pill, fixed corner ---------- */
+  .status-pill{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.02em;
+    color:var(--text-dim);
+    background:rgba(19,27,34,0.85);
+    border:1px solid var(--line);
+    padding:7px 12px;
+    border-radius:20px;
+    backdrop-filter:blur(6px);
+  }
+  .status-pill .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 0 3px var(--teal-dim);
+  }
+  @media (max-width:640px){ .status-pill{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    z-index:1;
+    padding:120px 0 100px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .kicker{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--amber);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:28px;
+  }
+  .hero .kicker::before{
+    content:"";
+    width:8px; height:8px;
+    background:var(--amber);
+    border-radius:50%;
+    box-shadow:0 0 0 4px var(--amber-dim);
+    flex:none;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 4.6rem);
+    line-height:0.98;
+    font-weight:800;
+    margin:0 0 18px;
+    letter-spacing:-0.02em;
+  }
+  .hero .role{
+    font-size:clamp(1.05rem, 2vw, 1.3rem);
+    color:var(--text-dim);
+    max-width:640px;
+    margin:0 0 46px;
+    font-weight:500;
+  }
+  .hero .role strong{ color:var(--text); font-weight:600; }
+
+  .terminal{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    max-width:640px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);
+  }
+  .terminal .bar{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:11px 14px;
+    background:var(--panel-alt);
+    border-bottom:1px solid var(--line);
+  }
+  .terminal .bar span{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--line);
+  }
+  .terminal .bar .label{
+    margin-left:8px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-faint);
+  }
+  .terminal .body{
+    padding:18px 20px 22px;
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    color:var(--text-dim);
+    white-space:pre-wrap;
+    min-height:150px;
+  }
+  .terminal .body .cmd{ color:var(--text); }
+  .terminal .body .ok{ color:var(--teal); }
+  .terminal .cursor{
+    display:inline-block;
+    width:7px; height:15px;
+    background:var(--amber);
+    vertical-align:text-bottom;
+    animation:blink 1s step-end infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .scroll-cue{
+    margin-top:56px;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-faint);
+    letter-spacing:0.02em;
+  }
+
+  /* ---------- section shell ---------- */
+  section.proj{
+    position:relative;
+    z-index:1;
+    padding:96px 0;
+    border-bottom:1px solid var(--line);
+  }
+  section.proj:last-of-type{ border-bottom:none; }
+
+  .proj-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:64px;
+    align-items:center;
+  }
+  .proj-grid.reverse .proj-copy{ order:2; }
+  .proj-grid.reverse .proj-visual{ order:1; }
+
+  @media (max-width:860px){
+    .proj-grid, .proj-grid.reverse{ grid-template-columns:1fr; gap:40px; }
+    .proj-grid.reverse .proj-copy, .proj-grid.reverse .proj-visual{ order:initial; }
+  }
+
+  .proj-index{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-faint);
+    margin-bottom:14px;
+    display:block;
+  }
+  .proj-copy h2{
+    font-size:clamp(1.5rem, 3vw, 2rem);
+    font-weight:700;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+  }
+  .proj-stack{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--amber);
+    margin:0 0 22px;
+  }
+  .proj-copy p{
+    color:var(--text-dim);
+    max-width:52ch;
+    margin:0 0 14px;
+    font-size:15.5px;
+  }
+  .proj-copy ul{
+    margin:22px 0 0;
+    padding:0;
+    list-style:none;
+  }
+  .proj-copy li{
+    color:var(--text-dim);
+    font-size:14px;
+    padding-left:18px;
+    position:relative;
+    margin-bottom:9px;
+  }
+  .proj-copy li::before{
+    content:"";
+    position:absolute;
+    left:0; top:8px;
+    width:6px; height:1.5px;
+    background:var(--text-faint);
+  }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; }
+  .tag{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-dim);
+    border:1px solid var(--line);
+    padding:5px 10px;
+    border-radius:5px;
+  }
+
+  /* screenshot slot */
+  .shot-slot{
+    margin-top:26px;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--text-faint);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .shot-slot svg{ flex:none; opacity:0.6; }
+
+  /* ---------- downloads row ---------- */
+  .download-row{
+    margin-top:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .download-link{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-dim);
+    text-decoration:none;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:7px 11px;
+    transition:color 0.15s, border-color 0.15s;
+  }
+  .download-link:hover{ color:var(--amber); border-color:var(--amber-dim); }
+  .download-link svg{ flex:none; }
+
+  /* ---------- code viewer (details/summary) ---------- */
+  .code-viewer{
+    margin-top:18px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .code-viewer summary{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 16px;
+    background:var(--panel-alt);
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-dim);
+  }
+  .code-viewer summary::-webkit-details-marker{ display:none; }
+  .code-viewer summary .fname{ color:var(--text); }
+  .code-viewer summary .toggle-label::after{
+    content:"view source";
+  }
+  .code-viewer[open] summary .toggle-label::after{
+    content:"hide source";
+  }
+  .code-viewer summary .toggle-label{ color:var(--teal); }
+  .code-viewer pre{
+    margin:0;
+    padding:16px 18px 20px;
+    overflow-x:auto;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--text-dim);
+    border-top:1px solid var(--line);
+  }
+  .code-viewer pre code{ color:inherit; }
+
+  /* ---------- project 1: terminal visual ---------- */
+  .visual-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+
+  /* ---------- project 2: LAN diagram ---------- */
+  .diagram-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px 20px;
+  }
+  .diagram-card svg{ width:100%; height:auto; }
+  .diagram-caption{
+    display:flex;
+    justify-content:space-between;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-faint);
+    margin-top:14px;
+    padding:0 4px;
+  }
+  .diagram-caption span.a{ color:var(--amber); }
+  .diagram-caption span.b{ color:var(--teal); }
+
+  /* ---------- project 3: ticket dashboard ---------- */
+  .dash-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .dash-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px;
+    border-bottom:1px solid var(--line);
+    background:var(--panel-alt);
+  }
+  .dash-head .title{ font-size:12.5px; color:var(--text-dim); font-family:var(--font-mono); }
+  .dash-metrics{ display:flex; gap:18px; }
+  .dash-metrics .m{ text-align:right; }
+  .dash-metrics .m b{ display:block; font-size:15px; color:var(--text); }
+  .dash-metrics .m span{ font-size:9.5px; color:var(--text-faint); font-family:var(--font-mono); text-transform:lowercase; }
+
+  .ticket-row{
+    display:grid;
+    grid-template-columns: 56px 1fr auto auto;
+    gap:12px;
+    align-items:center;
+    padding:13px 18px;
+    border-bottom:1px solid var(--line-soft);
+    font-size:13px;
+  }
+  .ticket-row:last-child{ border-bottom:none; }
+  .ticket-row .id{ font-family:var(--font-mono); color:var(--text-faint); font-size:11.5px; }
+  .ticket-row .desc{ color:var(--text); }
+  .ticket-row .desc small{ display:block; color:var(--text-faint); font-size:11px; margin-top:2px; font-family:var(--font-mono); }
+  .badge{
+    font-family:var(--font-mono);
+    font-size:10px;
+    padding:4px 8px;
+    border-radius:4px;
+    white-space:nowrap;
+    text-align:center;
+  }
+  .badge.urgent{ color:var(--red); background:rgba(225,96,77,0.12); }
+  .badge.high{ color:var(--amber); background:rgba(242,169,59,0.12); }
+  .badge.medium{ color:var(--teal); background:rgba(70,194,185,0.12); }
+  .badge.low{ color:var(--text-dim); background:rgba(143,160,172,0.12); }
+  .sla{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); text-align:right; min-width:110px; }
+
+  /* ---------- project 4: rack / equipment ---------- */
+  .rack-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+  }
+  .rack-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 4px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .rack-item:last-child{ border-bottom:none; }
+  .rack-item .name{ font-size:13.5px; color:var(--text); }
+  .rack-item .name small{ display:block; color:var(--text-faint); font-family:var(--font-mono); font-size:11px; margin-top:2px; }
+  .rack-led{ width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 3px var(--teal-dim); flex:none; }
+
+  .topo-line{
+    margin-top:20px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--text-faint);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px;
+  }
+  .topo-line b{ color:var(--text-dim); font-weight:500; }
+
+  /* ---------- footer ---------- */
+  footer{
+    position:relative;
+    z-index:1;
+    padding:70px 0 50px;
+  }
+  footer h3{
+    font-size:clamp(1.6rem, 3.5vw, 2.2rem);
+    margin:0 0 20px;
+    letter-spacing:-0.01em;
+  }
+  .contact-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    margin-bottom:50px;
+  }
+  .contact-row a{
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    color:var(--text-dim);
+    text-decoration:none;
+    border-bottom:1px solid var(--line);
+    padding-bottom:3px;
+    transition:color 0.15s, border-color 0.15s;
+  }
+  .contact-row a:hover{ color:var(--amber); border-color:var(--amber); }
+  footer .fine{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-faint);
+    border-top:1px solid var(--line);
+    padding-top:22px;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg" aria-hidden="true"></div>
+
+<div class="status-pill" aria-hidden="true">
+  <span class="dot"></span> link: up · 4 systems logged
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">SYSTEM STATUS — ALL SERVICES OPERATIONAL</p>
+    <h1>Prustide&nbsp;Bangandozou</h1>
+    <p class="role"><strong>Turning curiosity into technical skills. Hands-on projects in networking, IT, Python, and systems.
+
+    <div class="terminal" role="img" aria-label="Terminal window showing a simulated project overview command">
+      <div class="bar">
+        <span></span><span></span><span></span>
+        <span class="label">portfolio.sh</span>
+      </div>
+      <div class="body" id="typewriter"></div>
+    </div>
+
+    <p class="scroll-cue">Scroll to see the work</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- PROJECT 1 — TCP Network Diagnostics Tool -->
+  <section class="proj" id="project-1">
+    <div class="wrap">
+      <div class="proj-grid">
+        <div class="proj-copy">
+          <span class="proj-index">01 / PYTHON</span>
+          <h2>TCP-Based Network Diagnostics Tool</h2>
+          <p class="proj-stack">Python · sockets · logging</p>
+          <p>A client-server application that checks whether a host is reachable before you have to find out the hard way. It resolves domain names, opens a TCP connection to test a given port, and simulates latency conditions to see how the exchange behaves under stress.</p>
+          <ul>
+            <li>Resolves domain names to IP addresses and tests TCP connectivity and port availability</li>
+            <li>Validates input and handles exceptions so failures are reported clearly, not silently</li>
+            <li>Logs each check in detail to make troubleshooting communication issues faster</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Python</span>
+            <span class="tag">Sockets</span>
+            <span class="tag">Exception Handling</span>
+            <span class="tag">Logging</span>
+          </div>
+          <div class="download-row">
+            <a class="download-link" href="server.py" download>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              server.py
+            </a>
+            <a class="download-link" href="client.py" download>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              client.py
+            </a>
+            <a class="download-link" href="https://github.com/pbangandozou/TCP-Client-Server/blob/main/README.md" download>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              Github
+            </a>
+          </div>
+
+          <details class="code-viewer">
+            <summary><span class="fname">server.py — get_network_info()</span><span class="toggle-label"></span></summary>
+            <pre><code>def get_network_info(domain):
+    """
+    Retrieve network information for a domain (IP addresses and simulated latency).
+    Returns formatted string with results.
+    """
+    try:
+        # Resolve domain to IP addresses
+        ip_addresses = socket_lib.getaddrinfo(domain, None, socket_lib.AF_INET)
+        ip_list = [info[4][0] for info in ip_addresses]
+        ip_list = list(set(ip_list))  # Remove duplicates
+
+        # Simulate network latency (10-200 ms)
+        simulated_latency = random.uniform(10, 200)
+
+        # Format response
+        response = f"Domain: {domain}\n"
+        response += f"IP Address(es): {', '.join(ip_list)}\n"
+        response += f"Simulated Latency: {simulated_latency:.2f} ms"
+        return response
+    except socket_lib.gaierror:
+        return f"Error: Could not resolve domain {domain}"
+    except Exception as e:
+        return f"Error: Failed to retrieve network info for {domain}: {str(e)}"</code></pre>
+          </details>
+
+        </div>
+
+<div class="proj-visual">
+  <div class="visual-card">
+    <div class="bar">
+      <span></span><span></span><span></span>
+      <span class="label">netdiag.py</span>
+    </div>
+    <div class="body">
+      <span class="cmd">$ python client.py</span><br><br>
+
+      [INFO] Connecting to localhost:12000<br>
+      [INFO] TCP connection established<br><br>
+
+      [INFO] Sending domain request...<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;google.com<br><br>
+
+      [INFO] Network information received<br><br>
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Domain: google.com<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IP Address: 142.250.72.14<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Simulated Latency: 42.67 ms<br><br>
+
+      [INFO] Closing client socket<br>
+      <span class="ok">[DONE] Request completed successfully</span>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT 2 — Multi-LAN Network Design -->
+  <section class="proj" id="project-2">
+    <div class="wrap">
+      <div class="proj-grid reverse">
+        <div class="proj-copy">
+          <span class="proj-index">02 / CISCO PACKET TRACER</span>
+          <h2>Multi-LAN Network Design &amp; Configuration</h2>
+          <p class="proj-stack">Cisco Packet Tracer · Routing · Subnetting</p>
+          <p>Two separate subnets, one router standing between them, and full communication in both directions. This project is a working model of how addressing and routing decisions determine whether traffic actually gets where it's going.</p>
+          <ul>
+            <li>Designed and configured a dual-LAN topology connecting 192.168.1.0/24 and 192.168.2.0/24 through a central router</li>
+            <li>Assigned IP addresses, subnet masks, and default gateways across PCs, servers, printers, and switches</li>
+            <li>Configured router interfaces for reliable connectivity and correct traffic routing across both networks</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Subnetting</span>
+            <span class="tag">Routing</span>
+            <span class="tag">Switching</span>
+            <span class="tag">IP Addressing</span>
+          </div>
+          
+          <div class="download-row">
+            <a class="download-link" href="https://github.com/pbangandozou/Multi-LAN-Network-Design-Configuration/blob/main/README.md" download>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              Github
+            </a>
+          </div>
+        </div>
+
+<div class="proj-visual">
+  <div class="diagram-card">
+    <svg viewBox="0 0 720 360"
+         xmlns="http://www.w3.org/2000/svg"
+         role="img"
+         aria-label="Two LAN network topology connected through a central router">
+
+      <title>
+        Two-LAN topology with switches, clients, servers and printers
+        connected through a central router
+      </title>
+
+      <!-- ========================= -->
+      <!-- LAN 1 -->
+      <!-- ========================= -->
+
+      <rect x="20" y="35" width="285" height="290"
+            rx="8"
+            fill="none"
+            stroke="#F2A93B"
+            stroke-width="1.5"
+            stroke-dasharray="5 5"/>
+
+      <text x="162" y="24"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="11"
+            fill="#F2A93B">
+        LAN 1 · 192.168.1.0/24
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- LAN 2 -->
+      <!-- ========================= -->
+
+      <rect x="415" y="35" width="285" height="290"
+            rx="8"
+            fill="none"
+            stroke="#46C2B9"
+            stroke-width="1.5"
+            stroke-dasharray="5 5"/>
+
+      <text x="557" y="24"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="11"
+            fill="#46C2B9">
+        LAN 2 · 192.168.2.0/24
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- CENTRAL ROUTER -->
+      <!-- ========================= -->
+
+      <rect x="330" y="145"
+            width="60"
+            height="48"
+            rx="7"
+            fill="#182129"
+            stroke="#8FA0AC"
+            stroke-width="1.5"/>
+
+      <!-- router symbol -->
+      <path d="M345 169 L357 161 L375 161 L387 169 L375 177 L357 177 Z"
+            fill="none"
+            stroke="#E7EDF2"
+            stroke-width="1.3"/>
+
+      <text x="360" y="187"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#8FA0AC">
+        RTR
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- ROUTER CONNECTIONS -->
+      <!-- ========================= -->
+
+      <line x1="305" y1="169"
+            x2="330" y2="169"
+            stroke="#8FA0AC"
+            stroke-width="1.5"/>
+
+      <line x1="390" y1="169"
+            x2="415" y2="169"
+            stroke="#8FA0AC"
+            stroke-width="1.5"/>
+
+      <text x="309" y="158"
+            text-anchor="end"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#8FA0AC">
+        192.168.1.1
+      </text>
+
+      <text x="411" y="158"
+            text-anchor="start"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#8FA0AC">
+        192.168.2.1
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- LAN 1 SWITCH -->
+      <!-- ========================= -->
+
+      <rect x="125" y="145"
+            width="70"
+            height="40"
+            rx="6"
+            fill="#182129"
+            stroke="#8FA0AC"
+            stroke-width="1.4"/>
+
+      <text x="160" y="161"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="9"
+            fill="#E7EDF2">
+        SWITCH
+      </text>
+
+      <text x="160" y="175"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        SW-01
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- LAN 2 SWITCH -->
+      <!-- ========================= -->
+
+      <rect x="525" y="145"
+            width="70"
+            height="40"
+            rx="6"
+            fill="#182129"
+            stroke="#8FA0AC"
+            stroke-width="1.4"/>
+
+      <text x="560" y="161"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="9"
+            fill="#E7EDF2">
+        SWITCH
+      </text>
+
+      <text x="560" y="175"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        SW-02
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- LAN 1 SWITCH → ROUTER -->
+      <!-- ========================= -->
+
+      <line x1="195" y1="165"
+            x2="330" y2="165"
+            stroke="#8FA0AC"
+            stroke-width="1.3"/>
+
+
+      <!-- ========================= -->
+      <!-- LAN 2 SWITCH → ROUTER -->
+      <!-- ========================= -->
+
+      <line x1="390" y1="165"
+            x2="525" y2="165"
+            stroke="#8FA0AC"
+            stroke-width="1.3"/>
+
+
+      <!-- ========================= -->
+      <!-- LAN 1 DEVICES -->
+      <!-- ========================= -->
+
+      <!-- PC 1 -->
+      <rect x="55" y="70"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="79" y="88"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        PC
+      </text>
+
+      <text x="79" y="113"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .1.10
+      </text>
+
+
+      <!-- PC 2 -->
+      <rect x="215" y="70"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="239" y="88"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        PC
+      </text>
+
+      <text x="239" y="113"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .1.11
+      </text>
+
+
+      <!-- SERVER 1 -->
+      <rect x="215" y="235"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="239" y="253"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        SRV
+      </text>
+
+      <text x="239" y="278"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .1.7
+      </text>
+
+
+      <!-- PRINTER 1 -->
+      <rect x="55" y="235"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="79" y="253"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        PRN
+      </text>
+
+      <text x="79" y="278"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .1.8
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- LAN 1 CONNECTIONS -->
+      <!-- ========================= -->
+
+      <line x1="79" y1="100"
+            x2="145" y2="145"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+      <line x1="239" y1="100"
+            x2="175" y2="145"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+      <line x1="239" y1="235"
+            x2="175" y2="185"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+      <line x1="79" y1="235"
+            x2="145" y2="185"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+
+      <!-- ========================= -->
+      <!-- LAN 2 DEVICES -->
+      <!-- ========================= -->
+
+      <!-- PC 1 -->
+      <rect x="445" y="70"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="469" y="88"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        PC
+      </text>
+
+      <text x="469" y="113"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .2.2
+      </text>
+
+
+      <!-- PC 2 -->
+      <rect x="605" y="70"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="629" y="88"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        PC
+      </text>
+
+      <text x="629" y="113"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .2.3
+      </text>
+
+
+      <!-- SERVER 2 -->
+      <rect x="605" y="235"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="629" y="253"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        SRV
+      </text>
+
+      <text x="629" y="278"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .2.2
+      </text>
+
+
+      <!-- PRINTER 2 -->
+      <rect x="445" y="235"
+            width="48"
+            height="30"
+            rx="4"
+            fill="#182129"
+            stroke="#E7EDF2"
+            stroke-width="1.2"/>
+
+      <text x="469" y="253"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="8"
+            fill="#E7EDF2">
+        PRN
+      </text>
+
+      <text x="469" y="278"
+            text-anchor="middle"
+            font-family="JetBrains Mono, monospace"
+            font-size="7.5"
+            fill="#8FA0AC">
+        .2.6
+      </text>
+
+
+      <!-- ========================= -->
+      <!-- LAN 2 CONNECTIONS -->
+      <!-- ========================= -->
+
+      <line x1="469" y1="100"
+            x2="545" y2="145"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+      <line x1="629" y1="100"
+            x2="575" y2="145"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+      <line x1="629" y1="235"
+            x2="575" y2="185"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+      <line x1="469" y1="235"
+            x2="545" y2="185"
+            stroke="#8FA0AC"
+            stroke-width="1.2"/>
+
+
+      <!-- ========================= -->
+      <!-- PACKET FLOW -->
+      <!-- ========================= -->
+
+      <circle cx="250" cy="165" r="3" fill="#46C2B9">
+        <animate
+          attributeName="cx"
+          values="205;300;360;455"
+          dur="3s"
+          repeatCount="indefinite"/>
+      </circle>
+
+    </svg>
+
+    <div class="diagram-caption">
+      <span class="a">● LAN 1 — 192.168.1.0/24</span>
+      <span class="b">LAN 2 — 192.168.2.0/24 ●</span>
+    </div>
+  </div>
+</div>
+
+  </section>
+
+  <!-- PROJECT 3 — IT Help Desk Ticketing System -->
+  <section class="proj" id="project-3">
+    <div class="wrap">
+      <div class="proj-grid">
+        <div class="proj-copy">
+          <span class="proj-index">03 / PYTHON &amp; STREAMLIT</span>
+          <h2>IT Help Desk Ticketing System</h2>
+          <p class="proj-stack">Python · Streamlit · SQLite</p>
+          <p>A four-page ServiceNow-style app: employees submit tickets through a simple form, a technician dashboard lets staff filter, assign, and resolve them, and a built-in analytics page tracks the metrics a real help desk cares about.</p>
+          <ul>
+            <li>Auto-suggests a category and priority from the ticket text using a rule-based keyword triage layer</li>
+            <li>Technician dashboard with filtering, assignment, status changes, and a per-ticket activity log of notes</li>
+            <li>Analytics page charting tickets by status, priority, category, and technician workload, plus resolution-time distribution and average resolution time</li>
+            <li>SQLite data layer with a one-to-many tickets ↔ notes model and a demo seed script for realistic sample data</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">Python</span>
+            <span class="tag">Streamlit</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">pandas</span>
+          </div>
+
+          <div class="download-row">
+            <a class="download-link" href="https://itdeskticketing.streamlit.app/" download>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              Demo
+            </a>
+            <a class="download-link" href="https://github.com/pbangandozou/ITHelpDesk/blob/main/README.md" download>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              Github
+            </a>
+          </div>
+
+          <details class="code-viewer">
+            <summary><span class="fname">database.py — keyword-based triage</span><span class="toggle-label"></span></summary>
+            <pre><code>def suggest_category(text):
+    text = text.lower()
+    for category, keywords in CATEGORY_KEYWORDS.items():
+        if any(kw in text for kw in keywords):
+            return category
+    return "Other"
+
+
+def suggest_priority(text):
+    text = text.lower()
+    for priority, keywords in PRIORITY_KEYWORDS.items():
+        if any(kw in text for kw in keywords):
+            return priority
+    return "Medium"</code></pre>
+          </details>
+        </div>
+
+        <div class="proj-visual">
+          <div class="dash-card">
+            <div class="dash-head">
+              <span class="title">technician_dashboard.view</span>
+              <div class="dash-metrics">
+                <div class="m"><b>14</b><span>open</span></div>
+                <div class="m"><b>3.2h</b><span>avg resolution</span></div>
+              </div>
+            </div>
+
+            <div class="ticket-row">
+              <span class="id">TCK-1042</span>
+              <span class="desc">Printer on 3rd floor showing offline<small>in progress · Priya Patel</small></span>
+              <span class="badge high">High</span>
+              <span class="sla">auto: Printer</span>
+            </div>
+            <div class="ticket-row">
+              <span class="id">TCK-1041</span>
+              <span class="desc">VPN keeps dropping every few minutes<small>on hold · Alex Rivera</small></span>
+              <span class="badge urgent">Critical</span>
+              <span class="sla">auto: Network</span>
+            </div>
+            <div class="ticket-row">
+              <span class="id">TCK-1038</span>
+              <span class="desc">Locked out after password reset<small>resolved · self-service</small></span>
+              <span class="badge low">Low</span>
+              <span class="sla">auto: Access &amp; Accounts</span>
+            </div>
+            <div class="ticket-row">
+              <span class="id">TCK-1035</span>
+              <span class="desc">Ethernet port not detected — Desk 4B<small>open · unassigned</small></span>
+              <span class="badge medium">Medium</span>
+              <span class="sla">auto: Network</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT 4 — Home Networking Lab -->
+  <section class="proj" id="project-4">
+    <div class="wrap">
+      <div class="proj-grid reverse">
+        <div class="proj-copy">
+          <span class="proj-index">04 / INDEPENDENT LAB</span>
+          <h2>Home Networking Lab</h2>
+          <p class="proj-stack">TP-Link AX3000 · TL-SG105E</p>
+          <p>A physical network built and tested outside of a classroom or simulator — real hardware, real DHCP leases, real VLANs, and the troubleshooting that comes with all of it.</p>
+          <ul>
+            <li>Deployed a hands-on home network using a TP-Link AX3000 router and a TL-SG105E smart switch</li>
+            <li>Configured and tested connectivity across routing, switching, and IP addressing</li>
+            <li>Built practical experience with DHCP, VLANs, and everyday network troubleshooting</li>
+          </ul>
+          <div class="tag-row">
+            <span class="tag">DHCP</span>
+            <span class="tag">VLANs</span>
+            <span class="tag">Routing</span>
+            <span class="tag">Troubleshooting</span>
+          </div>
+        </div>
+
+        <div class="proj-visual">
+          <div class="rack-card">
+            <div class="rack-item">
+              <div class="name">TP-Link AX3000<small>Wi-Fi 6 dual-band router</small></div>
+              <div class="rack-led"></div>
+            </div>
+            <div class="rack-item">
+              <div class="name">TP-Link TL-SG105E<small>5-port smart managed switch</small></div>
+              <div class="rack-led"></div>
+            </div>
+            <div class="rack-item">
+              <div class="name">VLAN 10 — Trusted devices<small>desktop, laptop, NAS</small></div>
+              <div class="rack-led"></div>
+            </div>
+            <div class="rack-item">
+              <div class="name">VLAN 20 — IoT / guest<small>isolated from trusted VLAN</small></div>
+              <div class="rack-led"></div>
+            </div>
+            <div class="topo-line">
+              <b>modem</b> → <b>router</b> → <b>switch</b> → <b>desktop / laptop / NAS / IoT</b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3>Let's talk networks.</h3>
+    <div class="contact-row">
+      <a href="mailto:prustidejoel@gmail.com">prustidejoel@gmail.com</a>
+      <a href="https://github.com/pbangandozou" target="_blank" rel="noopener">github.com/pbangandozou</a>
+      <a href="https://www.linkedin.com/in/prustide-bangandozou-27a6ab23a/" target="_blank" rel="noopener">Linkedin</a>
+    </div>
+    <p class="fine">// replace the placeholder name and contact links above with your own — see the HTML comments near the top of this file.</p>
+  </div>
+</footer>
+
+<script>
+  // Simple typewriter effect for the hero terminal, respecting reduced-motion.
+  (function(){
+    var el = document.getElementById('typewriter');
+    var lines = [
+      { text: "$ ls projects/", cls: "cmd" },
+      { text: "" },
+      { text: "network-diagnostics.py", cls: "" },
+      { text: "multi-lan-design.pkt", cls: "" },
+      { text: "helpdesk-ticketing/", cls: "" },
+      { text: "home-lab/", cls: "" },
+      { text: "" },
+      { text: "$ status --all", cls: "cmd" },
+      { text: "4 projects online" , cls: "ok"}
+    ];
+
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function render(instant){
+      el.innerHTML = "";
+      lines.forEach(function(line){
+        var div = document.createElement('div');
+        if(line.cls) div.className = line.cls;
+        div.textContent = line.text || "\u00A0";
+        el.appendChild(div);
+      });
+      if(!instant){
+        var cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        el.appendChild(cursor);
+      }
+    }
+
+    if(reduced){
+      render(true);
+      return;
+    }
+
+    // typewriter: reveal line by line
+    el.innerHTML = "";
+    var li = 0;
+    function nextLine(){
+      if(li >= lines.length){
+        var cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        el.appendChild(cursor);
+        return;
+      }
+      var line = lines[li];
+      var div = document.createElement('div');
+      if(line.cls) div.className = line.cls;
+      el.appendChild(div);
+      var text = line.text || "";
+      var ci = 0;
+      function nextChar(){
+        div.textContent = text.slice(0, ci) || "\u00A0";
+        ci++;
+        if(ci <= text.length){
+          setTimeout(nextChar, 12);
+        } else {
+          li++;
+          setTimeout(nextLine, 90);
+        }
+      }
+      nextChar();
+    }
+    nextLine();
+  })();
+</script>
+
+</body>
+</html>
